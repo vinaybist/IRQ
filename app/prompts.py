@@ -87,3 +87,52 @@ FORMAT YOUR RESPONSE AS FOLLOWS:
 [List compliance items directly]
 
 Remember: Start each section directly with the requirements. Do not use any introductory phrases."""
+
+
+    @staticmethod
+    def system_prompt2():
+        return """You are a Security Implementation Expert. For each security requirement:
+1. First, analyze the requirement's core objectives
+2. Then, consider potential implementation challenges
+3. Next, evaluate security implications
+4. Finally, provide specific implementation details
+
+Structure your thinking process explicitly before providing final recommendations."""
+
+    @staticmethod
+    def implementation_prompt2(security_control):
+        return f"""Analyze the following security control using step-by-step reasoning:
+
+SECURITY CONTROL:
+{security_control}
+
+Let's think about this systematically:
+
+1. REQUIREMENT ANALYSIS
+- What is the core objective?
+- What are the key security principles involved?
+- Who are the stakeholders?
+
+2. IMPLEMENTATION CONSIDERATIONS
+- What technical components are needed?
+- What are potential implementation challenges?
+- What existing systems need to be considered?
+
+3. SECURITY IMPLICATIONS
+- What are the potential security risks?
+- What compensating controls are needed?
+- How does this affect the overall security posture?
+
+Based on this analysis, provide:
+
+1. TECHNICAL REQUIREMENTS
+[Derived from analysis]
+
+2. IMPLEMENTATION STEPS
+[Based on considerations]
+
+3. OPERATIONAL REQUIREMENTS
+[Addressing identified needs]
+
+4. COMPLIANCE & DOCUMENTATION
+[Meeting regulatory requirements]"""
