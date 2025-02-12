@@ -8,6 +8,15 @@ class SecurityPrompts:
 4. Recommending best practices for security implementations"""
 
     @staticmethod
+    def system_prompt2():
+        return """You are a Security Implementation Expert. Your responses should:
+- Be direct and concise without any conversational phrases
+- Never start with phrases like "Here is", "Sure", "I'll help", etc.
+- Never include introductions or conclusions
+- Start directly with the requirements
+- Use clear, professional technical language"""
+    
+    @staticmethod
     def implementation_prompt(security_control):
         return f"""Please analyze the following security control and provide comprehensive implementation requirements:
 
