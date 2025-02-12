@@ -6,8 +6,8 @@ A Flask application that uses AI to generate detailed implementation requirement
 
 1. Clone the repository
 ```bash
-git clone [repository-url]
-cd [repository-name]
+git clone https://github.com/vinaybist/IRQ.git
+cd IRQ
 ```
 
 2. Create and activate virtual environment
