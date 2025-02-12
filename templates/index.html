@@ -7,27 +7,31 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prismjs/1.29.0/themes/prism.min.css" rel="stylesheet" />
     <style>
+        .loading-spinner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
         .spinner {
-            border: 3px solid #f3f3f3;
+            border: 4px solid #f3f3f3;
             border-radius: 50%;
-            border-top: 3px solid #3498db;
-            width: 20px;
-            height: 20px;
+            border-top: 4px solid #3498db;
+            width: 40px;
+            height: 40px;
             animation: spin 1s linear infinite;
-            display: inline-block;
-            margin-right: 8px;
-            vertical-align: middle;
+        }
+
+        .spinner-text {
+            margin-top: 1rem;
+            color: #666;
         }
 
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
-        }
-
-        .button-content {
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
     </style>
 </head>
@@ -56,13 +60,9 @@
 
                 <div class="flex space-x-4">
                     <button 
-                        id="generate-btn"
                         onclick="generateRequirements()"
                         class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
-                        <span class="button-content">
-                            <span id="spinner" class="spinner hidden"></span>
-                            <span id="button-text">Generate Requirements</span>
-                        </span>
+                        Generate Requirements
                     </button>
                     
                     <button 
@@ -76,6 +76,14 @@
             <!-- Results Section -->
             <div id="results-section" class="bg-white rounded-lg shadow-md p-6 hidden">
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">Implementation Requirements</h2>
+                
+                <!-- Loading Spinner -->
+                <div id="loading-spinner" class="loading-spinner hidden">
+                    <div class="spinner"></div>
+                    <div class="spinner-text">Generating implementation requirements...</div>
+                </div>
+
+                <!-- Results Content -->
                 <div id="requirements-content" class="prose max-w-none">
                     <!-- Results will be inserted here -->
                 </div>
@@ -89,9 +97,7 @@
             const securityControl = document.getElementById('security-control').value;
             const resultsSection = document.getElementById('results-section');
             const requirementsContent = document.getElementById('requirements-content');
-            const generateBtn = document.getElementById('generate-btn');
-            const spinner = document.getElementById('spinner');
-            const buttonText = document.getElementById('button-text');
+            const loadingSpinner = document.getElementById('loading-spinner');
 
             if (!securityControl.trim()) {
                 alert('Please enter a security control');
@@ -99,14 +105,10 @@
             }
 
             try {
-                // Show spinner and disable button
-                spinner.classList.remove('hidden');
-                generateBtn.disabled = true;
-                generateBtn.classList.add('opacity-75');
-                buttonText.textContent = 'Generating...';
-
+                // Show spinner and hide content
                 resultsSection.classList.remove('hidden');
-                requirementsContent.innerHTML = 'Generating requirements...';
+                requirementsContent.classList.add('hidden');
+                loadingSpinner.classList.remove('hidden');
 
                 const response = await fetch('/analyze', {
                     method: 'POST',
@@ -118,6 +120,10 @@
 
                 const data = await response.json();
 
+                // Hide spinner and show content
+                loadingSpinner.classList.add('hidden');
+                requirementsContent.classList.remove('hidden');
+
                 if (response.ok) {
                     requirementsContent.innerHTML = marked.parse(data.requirements);
                 } else {
@@ -125,13 +131,9 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
+                loadingSpinner.classList.add('hidden');
+                requirementsContent.classList.remove('hidden');
                 requirementsContent.innerHTML = '<div class="text-red-600">An error occurred while generating requirements</div>';
-            } finally {
-                // Hide spinner and enable button
-                spinner.classList.add('hidden');
-                generateBtn.disabled = false;
-                generateBtn.classList.remove('opacity-75');
-                buttonText.textContent = 'Generate Requirements';
             }
         }
 
