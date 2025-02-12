@@ -54,3 +54,27 @@ Please provide:
 2. Validation methods
 3. Success metrics
 4. Compliance checkpoints"""
+
+
+ @staticmethod
+    def implementation_prompt2(security_control):
+        return f"""For the following security control, provide implementation requirements:
+
+SECURITY CONTROL:
+{security_control}
+
+FORMAT YOUR RESPONSE AS FOLLOWS:
+
+1. TECHNICAL REQUIREMENTS
+[List technical specifications directly]
+
+2. IMPLEMENTATION STEPS
+[List steps directly]
+
+3. OPERATIONAL REQUIREMENTS
+[List requirements directly]
+
+4. COMPLIANCE & DOCUMENTATION
+[List compliance items directly]
+
+Remember: Start each section directly with the requirements. Do not use any introductory phrases."""
