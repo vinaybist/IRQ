@@ -6,6 +6,30 @@
     <title>Security Implementation Generator</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prismjs/1.29.0/themes/prism.min.css" rel="stylesheet" />
+    <style>
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 3px solid #3498db;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .button-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
 </head>
 <body class="bg-gray-50 min-h-screen p-8">
     <div class="max-w-6xl mx-auto">
@@ -32,9 +56,13 @@
 
                 <div class="flex space-x-4">
                     <button 
+                        id="generate-btn"
                         onclick="generateRequirements()"
                         class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
-                        Generate Requirements
+                        <span class="button-content">
+                            <span id="spinner" class="spinner hidden"></span>
+                            <span id="button-text">Generate Requirements</span>
+                        </span>
                     </button>
                     
                     <button 
@@ -61,6 +89,9 @@
             const securityControl = document.getElementById('security-control').value;
             const resultsSection = document.getElementById('results-section');
             const requirementsContent = document.getElementById('requirements-content');
+            const generateBtn = document.getElementById('generate-btn');
+            const spinner = document.getElementById('spinner');
+            const buttonText = document.getElementById('button-text');
 
             if (!securityControl.trim()) {
                 alert('Please enter a security control');
@@ -68,6 +99,12 @@
             }
 
             try {
+                // Show spinner and disable button
+                spinner.classList.remove('hidden');
+                generateBtn.disabled = true;
+                generateBtn.classList.add('opacity-75');
+                buttonText.textContent = 'Generating...';
+
                 resultsSection.classList.remove('hidden');
                 requirementsContent.innerHTML = 'Generating requirements...';
 
@@ -89,6 +126,12 @@
             } catch (error) {
                 console.error('Error:', error);
                 requirementsContent.innerHTML = '<div class="text-red-600">An error occurred while generating requirements</div>';
+            } finally {
+                // Hide spinner and enable button
+                spinner.classList.add('hidden');
+                generateBtn.disabled = false;
+                generateBtn.classList.remove('opacity-75');
+                buttonText.textContent = 'Generate Requirements';
             }
         }
 
