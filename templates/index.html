@@ -1,174 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Security Implementation Generator</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prismjs/1.29.0/themes/prism.min.css" rel="stylesheet" />
-    <style>
-        .loading-spinner {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
+async function generateRequirements() {
+    const securityControl = document.getElementById('security-control').value;
+    const resultsSection = document.getElementById('results-section');
+    const requirementsContent = document.getElementById('requirements-content');
+    const loadingSpinner = document.getElementById('loading-spinner');
+
+    if (!securityControl.trim()) {
+        alert('Please enter a security control');
+        return;
+    }
+
+    try {
+        // Show results section and spinner, hide content
+        resultsSection.classList.remove('hidden');
+        requirementsContent.classList.add('hidden');
+        loadingSpinner.classList.remove('hidden');
+
+        const response = await fetch('/analyze', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ security_control: securityControl }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            requirementsContent.innerHTML = marked.parse(data.requirements);
+        } else {
+            requirementsContent.innerHTML = `<div class="text-red-600">Error: ${data.error}</div>`;
         }
-
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-radius: 50%;
-            border-top: 4px solid #3498db;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-
-        .spinner-text {
-            margin-top: 1rem;
-            color: #666;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
-</head>
-<body class="bg-gray-50 min-h-screen p-8">
-    <div class="max-w-6xl mx-auto">
-        <header class="mb-8">
-            <h1 class="text-4xl font-bold text-gray-800">Security Implementation Generator</h1>
-            <p class="text-gray-600 mt-2">Generate detailed implementation requirements for security controls using AI</p>
-        </header>
-        
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Input Section -->
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <h2 class="text-xl font-semibold text-gray-800 mb-4">Security Control Input</h2>
-                
-                <div class="mb-4">
-                    <label for="security-control" class="block text-gray-700 text-sm font-medium mb-2">
-                        Enter Security Control:
-                    </label>
-                    <textarea 
-                        id="security-control" 
-                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        rows="4"
-                        placeholder="e.g., Implement Multi-Factor Authentication for all administrative access"></textarea>
-                </div>
-
-                <div class="flex space-x-4">
-                    <button 
-                        onclick="generateRequirements()"
-                        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
-                        Generate Requirements
-                    </button>
-                    
-                    <button 
-                        onclick="viewPrompt()"
-                        class="text-blue-600 border border-blue-600 px-6 py-2 rounded-lg hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
-                        View Prompt
-                    </button>
-                </div>
-            </div>
-
-            <!-- Results Section -->
-            <div id="results-section" class="bg-white rounded-lg shadow-md p-6 hidden">
-                <h2 class="text-xl font-semibold text-gray-800 mb-4">Implementation Requirements</h2>
-                
-                <!-- Loading Spinner -->
-                <div id="loading-spinner" class="loading-spinner hidden">
-                    <div class="spinner"></div>
-                    <div class="spinner-text">Generating implementation requirements...</div>
-                </div>
-
-                <!-- Results Content -->
-                <div id="requirements-content" class="prose max-w-none">
-                    <!-- Results will be inserted here -->
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.2/marked.min.js"></script>
-    <script>
-        async function generateRequirements() {
-            const securityControl = document.getElementById('security-control').value;
-            const resultsSection = document.getElementById('results-section');
-            const requirementsContent = document.getElementById('requirements-content');
-            const loadingSpinner = document.getElementById('loading-spinner');
-
-            if (!securityControl.trim()) {
-                alert('Please enter a security control');
-                return;
-            }
-
-            try {
-                // Show spinner and hide content
-                resultsSection.classList.remove('hidden');
-                requirementsContent.classList.add('hidden');
-                loadingSpinner.classList.remove('hidden');
-
-                const response = await fetch('/analyze', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ security_control: securityControl }),
-                });
-
-                const data = await response.json();
-
-                // Hide spinner and show content
-                loadingSpinner.classList.add('hidden');
-                requirementsContent.classList.remove('hidden');
-
-                if (response.ok) {
-                    requirementsContent.innerHTML = marked.parse(data.requirements);
-                } else {
-                    requirementsContent.innerHTML = `<div class="text-red-600">Error: ${data.error}</div>`;
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                loadingSpinner.classList.add('hidden');
-                requirementsContent.classList.remove('hidden');
-                requirementsContent.innerHTML = '<div class="text-red-600">An error occurred while generating requirements</div>';
-            }
-        }
-
-        async function viewPrompt() {
-            const securityControl = document.getElementById('security-control').value;
-
-            if (!securityControl.trim()) {
-                alert('Please enter a security control');
-                return;
-            }
-
-            try {
-                const response = await fetch('/get-prompt', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ 
-                        security_control: securityControl,
-                        prompt_type: 'implementation'
-                    }),
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    alert(data.prompt);
-                } else {
-                    alert(data.error || 'An error occurred');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('An error occurred while retrieving the prompt');
-            }
-        }
-    </script>
-</body>
-</html>
+    } catch (error) {
+        console.error('Error:', error);
+        requirementsContent.innerHTML = '<div class="text-red-600">An error occurred while generating requirements</div>';
+    } finally {
+        // Always hide spinner and show content after completion (success or error)
+        loadingSpinner.classList.add('hidden');
+        requirementsContent.classList.remove('hidden');
+    }
+}
