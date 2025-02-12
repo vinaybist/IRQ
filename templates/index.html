@@ -33,6 +33,11 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* Initially hide the loading spinner */
+        #loading-spinner {
+            display: none;
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen p-8">
@@ -78,14 +83,14 @@
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">Implementation Requirements</h2>
                 
                 <!-- Loading Spinner -->
-                <div id="loading-spinner" class="loading-spinner hidden">
+                <div id="loading-spinner" class="loading-spinner">
                     <div class="spinner"></div>
                     <div class="spinner-text">Generating implementation requirements...</div>
                 </div>
 
                 <!-- Results Content -->
                 <div id="requirements-content" class="prose max-w-none">
-                    <!-- Results will be inserted here -->
+                    <div class="text-gray-500">Enter a security control and click "Generate Requirements" to start.</div>
                 </div>
             </div>
         </div>
@@ -93,6 +98,11 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.2/marked.min.js"></script>
     <script>
+        // Ensure spinner is hidden on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('loading-spinner').style.display = 'none';
+        });
+
         async function generateRequirements() {
             const securityControl = document.getElementById('security-control').value;
             const loadingSpinner = document.getElementById('loading-spinner');
@@ -103,11 +113,11 @@
                 return;
             }
 
-            // Show spinner, hide content
-            requirementsContent.style.display = 'none';
-            loadingSpinner.style.display = 'flex';
-
             try {
+                // Show spinner, hide content
+                loadingSpinner.style.display = 'flex';
+                requirementsContent.style.display = 'none';
+
                 const response = await fetch('/analyze', {
                     method: 'POST',
                     headers: {
@@ -118,6 +128,10 @@
 
                 const data = await response.json();
 
+                // Hide spinner
+                loadingSpinner.style.display = 'none';
+                requirementsContent.style.display = 'block';
+
                 if (response.ok) {
                     requirementsContent.innerHTML = marked.parse(data.requirements);
                 } else {
@@ -125,11 +139,9 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
-                requirementsContent.innerHTML = '<div class="text-red-600">An error occurred while generating requirements</div>';
-            } finally {
-                // Hide spinner, show content
                 loadingSpinner.style.display = 'none';
                 requirementsContent.style.display = 'block';
+                requirementsContent.innerHTML = '<div class="text-red-600">An error occurred while generating requirements</div>';
             }
         }
 
