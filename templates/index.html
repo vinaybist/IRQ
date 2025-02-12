@@ -74,7 +74,7 @@
             </div>
 
             <!-- Results Section -->
-            <div id="results-section" class="bg-white rounded-lg shadow-md p-6 hidden">
+            <div id="results-section" class="bg-white rounded-lg shadow-md p-6">
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">Implementation Requirements</h2>
                 
                 <!-- Loading Spinner -->
@@ -93,47 +93,46 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.2/marked.min.js"></script>
     <script>
-async function generateRequirements() {
-    const securityControl = document.getElementById('security-control').value;
-    const resultsSection = document.getElementById('results-section');
-    const requirementsContent = document.getElementById('requirements-content');
-    const loadingSpinner = document.getElementById('loading-spinner');
+        async function generateRequirements() {
+            const securityControl = document.getElementById('security-control').value;
+            const loadingSpinner = document.getElementById('loading-spinner');
+            const requirementsContent = document.getElementById('requirements-content');
 
-    if (!securityControl.trim()) {
-        alert('Please enter a security control');
-        return;
-    }
+            if (!securityControl.trim()) {
+                alert('Please enter a security control');
+                return;
+            }
 
-    try {
-        // Show results section and spinner, hide content
-        resultsSection.classList.remove('hidden');
-        requirementsContent.classList.add('hidden');
-        loadingSpinner.classList.remove('hidden');
+            // Show spinner, hide content
+            requirementsContent.style.display = 'none';
+            loadingSpinner.style.display = 'flex';
 
-        const response = await fetch('/analyze', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ security_control: securityControl }),
-        });
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ security_control: securityControl }),
+                });
 
-        const data = await response.json();
+                const data = await response.json();
 
-        if (response.ok) {
-            requirementsContent.innerHTML = marked.parse(data.requirements);
-        } else {
-            requirementsContent.innerHTML = `<div class="text-red-600">Error: ${data.error}</div>`;
+                if (response.ok) {
+                    requirementsContent.innerHTML = marked.parse(data.requirements);
+                } else {
+                    requirementsContent.innerHTML = `<div class="text-red-600">Error: ${data.error}</div>`;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                requirementsContent.innerHTML = '<div class="text-red-600">An error occurred while generating requirements</div>';
+            } finally {
+                // Hide spinner, show content
+                loadingSpinner.style.display = 'none';
+                requirementsContent.style.display = 'block';
+            }
         }
-    } catch (error) {
-        console.error('Error:', error);
-        requirementsContent.innerHTML = '<div class="text-red-600">An error occurred while generating requirements</div>';
-    } finally {
-        // Always hide spinner and show content after completion (success or error)
-        loadingSpinner.classList.add('hidden');
-        requirementsContent.classList.remove('hidden');
-    }
-}
+
         async function viewPrompt() {
             const securityControl = document.getElementById('security-control').value;
 
