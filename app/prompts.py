@@ -56,7 +56,7 @@ Please provide:
 4. Compliance checkpoints"""
 
 
- @staticmethod
+    @staticmethod
     def implementation_prompt2(security_control):
         return f"""For the following security control, provide implementation requirements:
 
