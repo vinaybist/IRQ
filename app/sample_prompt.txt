@@ -34,10 +34,10 @@ Convert this security control to implementation requirements:
 
 Security Control: [{control_stmt}]
 
-Referenced Controls:
-[Control-ID]: [paste control content]
-[Control-ID]: [paste control content]
-[Add more as needed]
+Referenced Documents (in markdown):
+"""
+[Paste your entire markdown content here]
+"""
 
 Please provide:
 1. Technical Implementation Requirements:
